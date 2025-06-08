@@ -27,8 +27,8 @@ dev = [
 ]
 
 [project.urls]
-bugs = "https://github.com/gitadmini/extractstoryboards/issues"
-homepage = "https://github.com/gitadmini/extractstoryboards"
+bugs = "https://github.com/gitadmini/comfyui_extractstoryboards/issues"
+homepage = "https://github.com/gitadmini/comfyui_extractstoryboards"
 Repository = "https://github.com/comfyanonymous/ComfyUI"
 
 [tool.comfy]
