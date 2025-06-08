@@ -29,7 +29,7 @@ dev = [
 [project.urls]
 bugs = "https://github.com/gitadmini/comfyui_extractstoryboards/issues"
 homepage = "https://github.com/gitadmini/comfyui_extractstoryboards"
-Repository = "https://github.com/comfyanonymous/ComfyUI"
+Repository = "https://github.com/gitadmini/comfyui_extractstoryboards"
 
 [tool.comfy]
 PublisherId = "xuhuan2048"
