@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyui_extractstoryboards"
-version = "0.0.2"
+version = "1.0.0"
 description = "A tool for decomposing video storyboards, which can obtain storyboards and keyframes"
 authors = [
   {name = "xuhuan2048", email = "457938831@qq.com"}
