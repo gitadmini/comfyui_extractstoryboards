@@ -6,9 +6,9 @@ __all__ = [
     "WEB_DIRECTORY",
 ]
 
-__author__ = """xuhuan1024"""
+__author__ = """xuhuan2048"""
 __email__ = "457938831@qq.com"
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 
 from .src.extractstoryboards.nodes import NODE_CLASS_MAPPINGS
 from .src.extractstoryboards.nodes import NODE_DISPLAY_NAME_MAPPINGS
