@@ -2,6 +2,7 @@ from inspect import cleandoc
 import torch
 import cv2
 import numpy as np
+import math
 
 class IntBatch:
     @classmethod
@@ -49,7 +50,8 @@ class ExtractStoryboards:  # 定义提取关键帧的类
             "required": {  # 必填参数
                 "image": ("IMAGE",),  # 输入的图片序列
                 "threshold": ("FLOAT", { "default": 0.1, "min": -1.0, "max": 1.00, "step": 0.01, }),
-                "mergeInterFrames": ("INT", { "default": 10, "min": 0, "max": 999, "step": 1, }),  # 合并间隔帧数
+                "mergeInterFrames": ("INT", { "default": 10, "min": 0, "max": 999, "step": 1, }),  # 合并间隔帧数（每批最小帧）
+                "maxFrames": ("INT", { "default": 999999, "min": 1, "max": 999999999, "step": 1, }),  # 每批最大帧（超过即拆分）
             }
         }
 
@@ -101,7 +103,7 @@ class ExtractStoryboards:  # 定义提取关键帧的类
         mse_val = np.mean((img1 - img2) ** 2)
         return mse_val
 
-    def execute(self, image,threshold, mergeInterFrames):
+    def execute(self, image,threshold, mergeInterFrames, maxFrames):
         # image: [B, H, W, C]
         B = image.shape[0]
         ssim_list = []
@@ -128,7 +130,29 @@ class ExtractStoryboards:  # 定义提取关键帧的类
                 filtered_keyframes.append(kf)
             else:
                 filtered_keyframes[-1] = kf  # 替换为更大的索引
-        return (image[filtered_keyframes], ','.join(map(str, filtered_keyframes)), filtered_keyframes)
+        # 如果间隔帧数超过最大帧数，则拆分成每批都小于或等于maxFrames的多个批
+        # 计算拆分点
+        split_points = [0]
+        for i in range(1, len(filtered_keyframes)):
+            num = filtered_keyframes[i] - filtered_keyframes[i-1]
+            if num > maxFrames:
+                num_per = math.ceil(num / maxFrames)
+                frames_per = num // num_per
+                print("num_per:", num_per)
+                print("frames_per:", frames_per)
+                for j in range(num_per):
+                    if j < num_per - 1:
+                        # 从0到num_per-2的值是filtered_keyframes[i-1] + j * maxFrames
+                        split_points.append(filtered_keyframes[i-1] + (j+1) * frames_per)
+                    else:
+                        # num_per-1的值是filtered_keyframes[i]
+                        split_points.append(filtered_keyframes[i])
+            else:
+                split_points.append(filtered_keyframes[i])
+        
+        # 使用split_points作为最终的关键帧索引
+        final_keyframes = split_points
+        return (image[final_keyframes], ','.join(map(str, final_keyframes)), final_keyframes)
 
     def phash(self, img, hash_size=8):
         """

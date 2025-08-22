@@ -2,6 +2,10 @@
 
 提取分镜
 
+## 历史
+
+- v1.0.2 ExtractStoryboards添加了参数maxFrames，可用来拆分长镜头
+
 ## 节点
 
 ### ExtractStoryboards
@@ -12,6 +16,7 @@
 
 - threshold:阈值 建议0.1。越小越宽松。如果视频动作幅度不大，可以提高一些阈值，0.3-0.4之间，不超过0.5为宜。
 - mergeInterFrames：合并孤帧。当关键帧所在的片段总帧数小于mergeInterFrames时，向左合并，即只保留最右侧的关键帧。（对于有转场动画的视频有一定的效果）
+- maxFrames:拆分长镜头。当分镜过长时，拆分成每个分镜帧数小于等于maxFrames。（对于接下来用wan2.1来处理的分镜，可以设置为81）
 
 ### Int Batch Size
 
