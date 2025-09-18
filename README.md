@@ -2,6 +2,8 @@
 
 提取分镜
 
+使用方法请参考 <https://www.bilibili.com/video/BV1qBTvzfE5M/?vd_source=52e0e85c23c34bb5ace2c8ebc915dbaf>
+
 ## 历史
 
 - v1.0.2 ExtractStoryboards添加了参数maxFrames，可用来拆分长镜头
