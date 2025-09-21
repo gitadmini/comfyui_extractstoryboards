@@ -6,7 +6,8 @@
 
 ## 历史
 
-- v1.0.2 ExtractStoryboards添加了参数maxFrames，可用来拆分长镜头
+- v1.0.4 bug修复，对最后一个分镜增加了最小值和最大值限制的判断
+- v1.0.3 ExtractStoryboards添加了参数maxFrames，可用来拆分长镜头
 
 ## 节点
 

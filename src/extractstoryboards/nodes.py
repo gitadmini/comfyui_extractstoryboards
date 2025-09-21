@@ -118,6 +118,7 @@ class ExtractStoryboards:  # 定义提取关键帧的类
         ssim_mean = sum(ssim_list) / len(ssim_list)
         ssim_limit = ssim_max - (ssim_max - ssim_mean) * 2 - threshold
         print("极限值：", ssim_limit)
+        
         keyframes = [0]
         for i, ssim_val in enumerate(ssim_list):
             if ssim_val < ssim_limit:
@@ -130,11 +131,20 @@ class ExtractStoryboards:  # 定义提取关键帧的类
                 filtered_keyframes.append(kf)
             else:
                 filtered_keyframes[-1] = kf  # 替换为更大的索引
+        # **先对 filtered_keyframes 检查尾部**：如果尾部到视频结尾的帧数 < mergeInterFrames，向左归并
+        # 尾部帧数按 B - filtered_keyframes[-1] 计算（你指定的方式）
+        while len(filtered_keyframes) > 1 and (B - filtered_keyframes[-1]) < mergeInterFrames:
+            # 向左归并：删除最后一个关键帧
+            filtered_keyframes.pop()
+        print("filtered_keyframes:", filtered_keyframes)
+        
         # 如果间隔帧数超过最大帧数，则拆分成每批都小于或等于maxFrames的多个批
-        # 计算拆分点
+        # 拆分：处理区间 i = 1 .. len(filtered_keyframes)，最后一个区间的 end = B
         split_points = [0]
-        for i in range(1, len(filtered_keyframes)):
-            num = filtered_keyframes[i] - filtered_keyframes[i-1]
+        for i in range(1, len(filtered_keyframes) + 1):
+            start = filtered_keyframes[i - 1]
+            end = filtered_keyframes[i] if i < len(filtered_keyframes) else B
+            num = end - start
             if num > maxFrames:
                 num_per = math.ceil(num / maxFrames)
                 frames_per = num // num_per
@@ -142,16 +152,18 @@ class ExtractStoryboards:  # 定义提取关键帧的类
                 print("frames_per:", frames_per)
                 for j in range(num_per):
                     if j < num_per - 1:
-                        # 从0到num_per-2的值是filtered_keyframes[i-1] + j * maxFrames
-                        split_points.append(filtered_keyframes[i-1] + (j+1) * frames_per)
+                        split_points.append(start + (j + 1) * frames_per)
                     else:
-                        # num_per-1的值是filtered_keyframes[i]
-                        split_points.append(filtered_keyframes[i])
+                        split_points.append(end)
             else:
-                split_points.append(filtered_keyframes[i])
-        
-        # 使用split_points作为最终的关键帧索引
+                split_points.append(end)
+
         final_keyframes = split_points
+
+        # 6) 如果最后一个是 B，则删除（避免越界）
+        if final_keyframes and final_keyframes[-1] == B:
+            final_keyframes.pop()
+            
         return (image[final_keyframes], ','.join(map(str, final_keyframes)), final_keyframes)
 
     def phash(self, img, hash_size=8):
